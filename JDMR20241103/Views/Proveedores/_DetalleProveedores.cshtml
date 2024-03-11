@@ -3,94 +3,92 @@
 }
 @model IEnumerable<DetalleProveedor>
 <input type="hidden" name="accion" value="@ViewBag.Accion" />
-<div class="table-responsive col-md-12">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Calle)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Ciudad)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Estado)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CodigoPostal)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Pais)
-                </th>
-                <th>
-                    @if (ViewBag.Accion == "Create" || ViewBag.Accion == "Edit")
-                    {
-                        <button type="submit" class="btn btn-primary" formaction="@Url.Action("AgregarDetalles")">Agregar</button>
-                    }
-
-                </th>
-            </tr>
-
-        </thead>
-        <tbody>
-            @{
-                int index = -1;
-            }
-            @if (Model != null && Model.Count() > 0)
-            {
-                @foreach (var item in Model)
+<table class="table table-secondary table-striped table-hover">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Calle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ciudad)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Estado)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CodigoPostal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Pais)
+            </th>
+            <th>
+                @if (ViewBag.Accion == "Create" || ViewBag.Accion == "Edit")
                 {
-                    index++;
-                    // var hidde = "table";
-                    if (item.Id > -1)
-                    {
-                        <tr>
-                            <td>
-                                <input type="hidden" value="@item.Id" name="DetalleProveedor[@index].Id">
-                                <input type="hidden" value="@item.ProveedorId" name="DetalleProveedor[@index].ProveedorId">
-                                <input class="form-control" data-readonly type="text" name="DetalleProveedor[@index].Calle" value="@item.Calle">
-                            </td>
-                            <td>
-                                <input class="form-control" data-readonly type="text" name="DetalleProveedor[@index].Ciudad" value="@item.Ciudad">
-                            </td>
-                            <td>
-                                <input class="form-control" data-readonly type="text" name="DetalleProveedor[@index].Estado" value="@item.Estado">
-                            </td>
-                            <td>
-                                <input class="form-control" data-readonly type="text" name="DetalleProveedor[@index].CodigoPostal" value="@item.CodigoPostal">
-                            </td>
-                             <td>
-                                <input class="form-control" data-readonly type="text" name="DetalleProveedor[@index].Pais" value="@item.Pais">
-                            </td>
-                            <td>
-                                @if (ViewBag.Accion == "Create" || ViewBag.Accion == "Edit")
-                                {
-                                    <button name="index" value="@index" class="btn btn-primary" type="submit" formaction="@Url.Action("EliminarDetalles")">Eliminar</button>
-                                }
+                    <button type="submit" class="btn btn-primary" formaction="@Url.Action("AgregarDetalles")">Agregar</button>
+                }
 
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        <tr style="display:none">
-                            <td>
-                                <input type="hidden" value="@item.Id" name="DetalleProveedor[@index].Id">
-                                <input type="hidden" value="@item.ProveedorId" name="DetalleProveedor[@index].ProveedorId">
-                                <input type="hidden" name="DetalleProveedor[@index].Calle" value="@item.Calle">
-                                <input type="hidden" name="DetalleProveedor[@index].Ciudad" value="@item.Ciudad">
-                                <input type="hidden" name="DetalleProveedor[@index].Estado" value="@item.Estado">
-                                <input type="hidden" name="DetalleProveedor[@index].CodigoPostal" value="@item.CodigoPostal">
-                                <input type="hidden" name="DetalleProveedor[@index].Pais" value="@item.Pais">
-                            </td>
-                        </tr>
-                    }
+            </th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @{
+            int index = -1;
+        }
+        @if (Model != null && Model.Count() > 0)
+        {
+            @foreach (var item in Model)
+            {
+                index++;
+                // var hidde = "table";
+                if (item.Id > -1)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" value="@item.Id" name="DetalleProveedores[@index].Id">
+                            <input type="hidden" value="@item.ProveedorId" name="DetalleProveedores[@index].ProveedorId">
+                            <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Calle" value="@item.Calle">
+                        </td>
+                        <td>
+                            <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Ciudad" value="@item.Ciudad">
+                        </td>
+                        <td>
+                            <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Estado" value="@item.Estado">
+                        </td>
+                        <td>
+                            <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].CodigoPostal" value="@item.CodigoPostal">
+                        </td>
+                        <td>
+                            <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Pais" value="@item.Pais">
+                        </td>
+                        <td>
+                            @if (ViewBag.Accion == "Create" || ViewBag.Accion == "Edit")
+                            {
+                                <button name="index" value="@index" class="btn btn-primary" type="submit" formaction="@Url.Action("EliminarDetalles")">Eliminar</button>
+                            }
+
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr style="display:none">
+                        <td>
+                            <input type="hidden" value="@item.Id" name="DetalleProveedores[@index].Id">
+                            <input type="hidden" value="@item.ProveedorId" name="DetalleProveedores[@index].ProveedorId">
+                            <input type="hidden" name="DetalleProveedores[@index].Calle" value="@item.Calle">
+                            <input type="hidden" name="DetalleProveedores[@index].Ciudad" value="@item.Ciudad">
+                            <input type="hidden" name="DetalleProveedores[@index].Estado" value="@item.Estado">
+                            <input type="hidden" name="DetalleProveedores[@index].CodigoPostal" value="@item.CodigoPostal">
+                            <input type="hidden" name="DetalleProveedores[@index].Pais" value="@item.Pais">
+                        </td>
+                    </tr>
                 }
             }
+        }
 
-        </tbody>
-    </table>
-</div>
+    </tbody>
+</table>
 @if (ViewBag.Accion == "Details" || ViewBag.Accion == "Delete")
 {
     <script>
