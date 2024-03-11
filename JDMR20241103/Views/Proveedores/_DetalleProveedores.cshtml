@@ -3,6 +3,7 @@
 }
 @model IEnumerable<DetalleProveedor>
 <input type="hidden" name="accion" value="@ViewBag.Accion" />
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 <table class="table table-secondary table-striped table-hover">
     <thead>
         <tr>
@@ -48,18 +49,28 @@
                             <input type="hidden" value="@item.Id" name="DetalleProveedores[@index].Id">
                             <input type="hidden" value="@item.ProveedorId" name="DetalleProveedores[@index].ProveedorId">
                             <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Calle" value="@item.Calle">
+                            <span asp-validation-for="DetalleProveedores[@index].Calle" class="text-danger"></span>
+
                         </td>
                         <td>
                             <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Ciudad" value="@item.Ciudad">
+                            <span asp-validation-for="DetalleProveedores[@index].Ciudad" class="text-danger"></span>
+
                         </td>
                         <td>
                             <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Estado" value="@item.Estado">
+                            <span asp-validation-for="DetalleProveedores[@index].Estado" class="text-danger"></span>
+
                         </td>
                         <td>
                             <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].CodigoPostal" value="@item.CodigoPostal">
+                            <span asp-validation-for="DetalleProveedores[@index].CodigoPostal" class="text-danger"></span>
+
                         </td>
                         <td>
                             <input class="form-control" data-readonly type="text" name="DetalleProveedores[@index].Pais" value="@item.Pais">
+                            <span asp-validation-for="DetalleProveedores[@index].Pais" class="text-danger"></span>
+
                         </td>
                         <td>
                             @if (ViewBag.Accion == "Create" || ViewBag.Accion == "Edit")
@@ -89,6 +100,7 @@
 
     </tbody>
 </table>
+
 @if (ViewBag.Accion == "Details" || ViewBag.Accion == "Delete")
 {
     <script>
@@ -100,3 +112,8 @@
 
     </script>
 }
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
