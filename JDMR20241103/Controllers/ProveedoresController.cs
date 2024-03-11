@@ -168,14 +168,16 @@ namespace JDMR20241103.Controllers
                     det.Pais = d.Pais;
                 }
                 // Obtener todos los detalles que seran eliminados y actualizar a la base de datos
-                var delDet = proveedor.DetalleProveedores.Where(s => s.Id < 0).ToList();
-                if (delDet != null && delDet.Count > 0)
+                var delDetIds = proveedor.DetalleProveedores.Where(s => s.Id < 0).Select(s => -s.Id).ToList();
+                if (delDetIds != null && delDetIds.Count > 0)
                 {
-                    foreach (var d in delDet)
+                    foreach (var detalleId in delDetIds) // Cambiado de 'id' a 'detalleId'
                     {
-                        d.Id = d.Id * -1;
-                        var det = proveedor.DetalleProveedores.FirstOrDefault(s => s.Id == d.Id);
-                        _context.Remove(det);
+                        var det = await _context.DetalleProveedores.FindAsync(detalleId); // Cambiado de 'id' a 'detalleId'
+                        if (det != null)
+                        {
+                            _context.DetalleProveedores.Remove(det);
+                        }
                     }
                 }
                 // Aplicar esos cambios a la base de datos
