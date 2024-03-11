@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using JDMR20241103.Data;
 using JDMR20241103.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace JDMR20241103.Controllers
 {
@@ -36,7 +37,9 @@ namespace JDMR20241103.Controllers
             }
 
             var proveedor = await _context.Proveedores
-                .FirstOrDefaultAsync(m => m.Id == id);
+                 .Include(s => s.DetalleProveedores)
+                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (proveedor == null)
             {
                 return NotFound();
@@ -48,7 +51,18 @@ namespace JDMR20241103.Controllers
         // GET: Proveedores/Create
         public IActionResult Create()
         {
-            return View();
+            var proveedor = new Proveedor();
+            proveedor.DetalleProveedores = new List<DetalleProveedor>();
+            proveedor.DetalleProveedores.Add(new DetalleProveedor
+            {
+                Calle = "",
+                Ciudad = "",
+                Estado = "",
+                CodigoPostal = "",
+                Pais = ""
+            });
+            ViewBag.Accion = "Create";
+            return View(proveedor);
         }
 
         // POST: Proveedores/Create
@@ -56,16 +70,45 @@ namespace JDMR20241103.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Telefono,Descripcion")] Proveedor proveedor)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Telefono,Descripcion,DetalleProveedores")] Proveedor proveedor)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(proveedor);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(proveedor);
+            _context.Add(proveedor);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
+        #region DETALLES
+        [HttpPost]
+        public ActionResult AgregarDetalles([Bind("Id,Nombre,Nombre,Telefono,Descripcion,DetalleProveedores")] Proveedor proveedor, string accion)
+        {
+            proveedor.DetalleProveedores.Add(new DetalleProveedor
+            {
+                Calle = "",
+                Ciudad = "",
+                Estado = "",
+                CodigoPostal = "",
+                Pais = ""
+            });
+            ViewBag.Accion = accion;
+            return View(accion, proveedor);
+        }
+
+        public ActionResult EliminarDetalles([Bind("Id,Nombre,Nombre,Telefono,Descripcion,DetalleProveedores")] Proveedor proveedor, string accion, int index)
+        {
+            var det = proveedor.DetalleProveedores[index];
+            if (accion == "Edit" && det.Id > 0)
+            {
+                det.Id = det.Id * -1;
+            }
+            else
+            {
+                proveedor.DetalleProveedores.RemoveAt(index);
+            }
+
+            ViewBag.Accion = accion;
+            return View(accion, proveedor);
+        }
+        #endregion
 
         // GET: Proveedores/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -75,11 +118,15 @@ namespace JDMR20241103.Controllers
                 return NotFound();
             }
 
-            var proveedor = await _context.Proveedores.FindAsync(id);
+            var proveedor = await _context.Proveedores
+               .Include(s => s.DetalleProveedores)
+               .FirstAsync(s => s.Id == id);
+
             if (proveedor == null)
             {
                 return NotFound();
             }
+            ViewBag.Accion = "Edit";
             return View(proveedor);
         }
 
@@ -88,34 +135,65 @@ namespace JDMR20241103.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Telefono,Descripcion")] Proveedor proveedor)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Telefono,Descripcion,DetalleProveedores")] Proveedor proveedor)
         {
             if (id != proveedor.Id)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            try
             {
-                try
+                // Obtener los datos de la base de datos que van a ser modificados
+                var proveedorUpdate = await _context.Proveedores
+                        .Include(s => s.DetalleProveedores)
+                        .FirstAsync(s => s.Id == proveedor.Id);
+                proveedorUpdate.Nombre = proveedor.Nombre;
+                proveedorUpdate.Telefono = proveedor.Telefono;
+                proveedorUpdate.Descripcion = proveedor.Descripcion;
+                // Obtener todos los detalles que seran nuevos y agregarlos a la base de datos
+                var detNew = proveedor.DetalleProveedores.Where(s => s.Id == 0);
+                foreach (var d in detNew)
                 {
-                    _context.Update(proveedor);
-                    await _context.SaveChangesAsync();
+                    proveedorUpdate.DetalleProveedores.Add(d);
                 }
-                catch (DbUpdateConcurrencyException)
+                // Obtener todos los detalles que seran modificados y actualizar a la base de datos
+                var detUpdate = proveedor.DetalleProveedores.Where(s => s.Id > 0);
+                foreach (var d in detUpdate)
                 {
-                    if (!ProveedorExists(proveedor.Id))
+                    var det = proveedorUpdate.DetalleProveedores.FirstOrDefault(s => s.Id == d.Id);
+                    det.Calle = d.Calle;
+                    det.Ciudad = d.Ciudad;
+                    det.Estado = d.Estado;
+                    det.CodigoPostal = d.CodigoPostal;
+                    det.Pais = d.Pais;
+                }
+                // Obtener todos los detalles que seran eliminados y actualizar a la base de datos
+                var delDet = proveedor.DetalleProveedores.Where(s => s.Id < 0).ToList();
+                if (delDet != null && delDet.Count > 0)
+                {
+                    foreach (var d in delDet)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        d.Id = d.Id * -1;
+                        var det = proveedor.DetalleProveedores.FirstOrDefault(s => s.Id == d.Id);
+                        _context.Remove(det);
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                // Aplicar esos cambios a la base de datos
+                _context.Update(proveedorUpdate);
+                await _context.SaveChangesAsync();
             }
-            return View(proveedor);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProveedorExists(proveedor.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Proveedores/Delete/5
@@ -125,14 +203,15 @@ namespace JDMR20241103.Controllers
             {
                 return NotFound();
             }
-
             var proveedor = await _context.Proveedores
+                .Include(s => s.DetalleProveedores)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (proveedor == null)
             {
                 return NotFound();
             }
-
+            ViewBag.Accion = "Delete";
             return View(proveedor);
         }
 
