@@ -1,7 +1,7 @@
 ﻿@model JDMR20241103.Models.Proveedor
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar";
 }
 
 <div class="row">
@@ -36,10 +36,10 @@
             <form asp-action="Delete" class="row">
                 <input type="hidden" asp-for="Id" />
                 <div class="col-md-6" style="margin-top:10px;">
-                    <input style="width:100%;" type="submit" value="Delete" class="btn btn-danger" />
+                    <input style="width:100%;" type="submit" value="Eliminar" class="btn btn-danger" />
                 </div>
                 <div class="col-md-6" style="margin-top:10px;">
-                    <a style="width:100%;" class="btn btn-secondary" asp-action="Index">Back to List</a>
+                    <a style="width:100%;" class="btn btn-secondary" asp-action="Index">Cancelar</a>
                 </div>
             </form>
         </div>
